@@ -1,0 +1,22 @@
+{
+  "name": "daniel-afolabi-qa-automation",
+  "version": "1.0.0",
+  "description": "QA Automation Portfolio — Cypress test suites for OrangeHRM, DemoQA, and E-Commerce apps",
+  "author": "Daniel Afolabi",
+  "license": "MIT",
+  "scripts": {
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "cy:run:login": "cypress run --spec 'cypress/e2e/login/**'",
+    "cy:run:demoqa": "cypress run --spec 'cypress/e2e/demoqa/**'",
+    "cy:run:ecommerce": "cypress run --spec 'cypress/e2e/ecommerce/**'",
+    "cy:run:headed": "cypress run --headed",
+    "cy:report": "cypress run --reporter mochawesome"
+  },
+  "devDependencies": {
+    "cypress": "^13.6.0",
+    "mochawesome": "^7.1.3",
+    "mochawesome-merge": "^4.3.0",
+    "mochawesome-report-generator": "^6.2.0"
+  }
+}

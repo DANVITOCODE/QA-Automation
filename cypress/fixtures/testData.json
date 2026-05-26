@@ -1,0 +1,46 @@
+{
+  "validUser": {
+    "username": "Admin",
+    "password": "admin123"
+  },
+  "invalidUsers": [
+    {
+      "username": "wronguser",
+      "password": "admin123",
+      "expectedError": "Invalid credentials"
+    },
+    {
+      "username": "Admin",
+      "password": "wrongpassword",
+      "expectedError": "Invalid credentials"
+    },
+    {
+      "username": "",
+      "password": "",
+      "expectedError": "Required"
+    }
+  ],
+  "sqlInjectionPayloads": [
+    "' OR '1'='1",
+    "' OR 1=1--",
+    "admin'--",
+    "' UNION SELECT * FROM users--"
+  ],
+  "demoQAUser": {
+    "firstName": "Daniel",
+    "lastName": "Afolabi",
+    "email": "daniel@example.com",
+    "mobile": "9137678788",
+    "gender": "Male"
+  },
+  "ecommerceProducts": [
+    "Sauce Labs Backpack",
+    "Sauce Labs Bike Light",
+    "Sauce Labs Bolt T-Shirt"
+  ],
+  "checkoutInfo": {
+    "firstName": "Daniel",
+    "lastName": "Afolabi",
+    "zip": "12345"
+  }
+}
