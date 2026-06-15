@@ -1,77 +1,74 @@
-# .github/workflows/cypress.yml
-# ─────────────────────────────────────────────────────────────────────────────
-# Runs all Cypress test suites automatically on every push and pull request.
-# Also runs on a daily schedule to catch any regressions from live app changes.
-# ─────────────────────────────────────────────────────────────────────────────
-
 name: Cypress Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main, develop]
   schedule:
-    # Runs at 07:00 UTC every day (keeps portfolio tests fresh)
-    - cron: '0 7 * * *'
-  workflow_dispatch: # allows manual trigger from GitHub UI
+    - cron: '0 6 * * *'
 
 jobs:
   cypress-run:
+    name: ${{ matrix.suite }} tests
     runs-on: ubuntu-latest
-    strategy:
-      # Run all three suites in parallel — faster CI
-      matrix:
-        suite: [login, demoqa, ecommerce]
 
-    name: "${{ matrix.suite }} tests"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: login
+            spec: 'cypress/e2e/login/**'
+          - suite: demoqa
+            spec: 'cypress/e2e/demoqa/**'
+          - suite: ecommerce
+            spec: 'cypress/e2e/ecommerce/**'
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Cypress — ${{ matrix.suite }} suite
+      - name: Run Cypress — ${{ matrix.suite }}
         uses: cypress-io/github-action@v6
         with:
-          spec: cypress/e2e/${{ matrix.suite }}/**
           browser: chrome
           headed: false
+          spec: ${{ matrix.suite == 'login' && 'cypress/e2e/login/**' || matrix.suite == 'demoqa' && 'cypress/e2e/demoqa/**' || 'cypress/e2e/ecommerce/**' }}
         env:
-          # Pass secrets from GitHub repo settings — never hardcode credentials
           CYPRESS_ORANGEHRM_USER: ${{ secrets.ORANGEHRM_USER }}
           CYPRESS_ORANGEHRM_PASS: ${{ secrets.ORANGEHRM_PASS }}
           CYPRESS_ECOMMERCE_USER: ${{ secrets.ECOMMERCE_USER }}
           CYPRESS_ECOMMERCE_PASS: ${{ secrets.ECOMMERCE_PASS }}
 
       - name: Upload screenshots on failure
-        uses: actions/upload-artifact@v4
         if: failure()
+        uses: actions/upload-artifact@v4
         with:
           name: cypress-screenshots-${{ matrix.suite }}
           path: cypress/screenshots
-          retention-days: 7
+          if-no-files-found: ignore
 
       - name: Upload videos
-        uses: actions/upload-artifact@v4
         if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: cypress-videos-${{ matrix.suite }}
           path: cypress/videos
-          retention-days: 7
+          if-no-files-found: ignore
 
-      - name: Upload test reports
-        uses: actions/upload-artifact@v4
+      - name: Upload reports
         if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: cypress-report-${{ matrix.suite }}
+          name: cypress-reports-${{ matrix.suite }}
           path: cypress/reports
-          retention-days: 7
+          if-no-files-found: ignore
